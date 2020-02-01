@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: -659436003403421464}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -317,7 +317,9 @@ MonoBehaviour:
   PowerLevel: 100
   PartsFound: 
   BatteryCount: 0
+  BatteryMax: 0
   PowerUsageRate: 0.1
+  Movement: {fileID: 0}
 --- !u!1001 &7531390901883215916
 PrefabInstance:
   m_ObjectHideFlags: 0
