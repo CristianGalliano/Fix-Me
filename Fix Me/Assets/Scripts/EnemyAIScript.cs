@@ -5,11 +5,11 @@ using UnityEngine.AI;
 
 public class EnemyAIScript : MonoBehaviour
 {
-    private PlayerContoller target = null;
+    private Player target = null;
     private bool isSearching = false;
     private Vector3 randomPosition;
 
-    [SerializeField] private PlayerContoller testController;
+    [SerializeField] private Player testController;
 
     [Header("Starting State")]
     [SerializeField] private bool isSleeping;
@@ -48,10 +48,10 @@ public class EnemyAIScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {        
-        if (Input.GetKeyDown(KeyCode.E) && target == null)
-        {
-            StartCoroutine(DetectPlayer(new Collider()));
-        }
+        //if (Input.GetKeyDown(KeyCode.E) && target == null)
+        //{
+        //    StartCoroutine(DetectPlayer(new Collider()));
+        //}
 
         if (isSleeping && !target && !isSearching)
         {
@@ -68,31 +68,33 @@ public class EnemyAIScript : MonoBehaviour
             idlingTrigger.enabled = false;
             sleepStateTrigger.enabled = false;
 
-            //moveTowardsTarget(searchingMoveSpeed, target.transform.position);
-            moveTowardsRandomLocation(searchingMoveSpeed);
+            moveTowardsTarget(searchingMoveSpeed, target.transform.position);
+            //moveTowardsRandomLocation(searchingMoveSpeed);
         }
         else if (isSearching && !target && !isSleeping)
         {
+            Debug.Log("searching state");
             //alerted roaming state.
             searchingStateTrigger.enabled = true;
             idlingTrigger.enabled = false;
             sleepStateTrigger.enabled = false;
-
-
+            moveTowardsRandomLocation(searchingMoveSpeed);
         }
         else if (!isSearching && !target && !isSleeping)
         {
+            Debug.Log("idle state");
             GetComponent<Animator>().SetBool("Open_Anim", true);
             // idle roaming state.
             idlingTrigger.enabled = true;
             searchingStateTrigger.enabled = false;
             sleepStateTrigger.enabled = false;
+            moveTowardsRandomLocation(searchingMoveSpeed);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<PlayerContoller>())
+        if (other.GetComponent<Player>())
         {
             StartCoroutine(DetectPlayer(other));
         }
@@ -100,7 +102,7 @@ public class EnemyAIScript : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<PlayerContoller>())
+        if (other.GetComponent<Player>())
         {
             StartCoroutine(searchForPlayer());
         }
@@ -116,7 +118,7 @@ public class EnemyAIScript : MonoBehaviour
             GetComponent<Animator>().SetBool("Open_Anim", true);
             yield return new WaitForSeconds(3.2f);
         }
-        //target = other.GetComponent<PlayerContoller>();             
+        target = other.GetComponent<Player>();             
         GetComponent<Animator>().SetBool("Walk_Anim", true);
         yield return new WaitForSeconds(1f);
         target = testController;
@@ -129,7 +131,6 @@ public class EnemyAIScript : MonoBehaviour
     {
         isSearching = true;
         yield return new WaitForSeconds(searchTime);
-        target = null;
     }
 
     private void moveTowardsTarget(float MoveSpeed, Vector3 TargetPos)
