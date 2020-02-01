@@ -15,8 +15,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float smoothTime = 5f;
         public bool lockCursor = true;
 
-
-        private Quaternion m_CharacterTargetRot;
+        public Quaternion m_CharacterTargetRot;
         private Quaternion m_CameraTargetRot;
         private bool m_cursorIsLocked = true;
 
@@ -29,6 +28,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public void LookRotation(Transform character, Transform camera)
         {
+
             float yRot = Input.GetAxis("Mouse X") * XSensitivity;
             float xRot = Input.GetAxis("Mouse Y") * YSensitivity;
 
@@ -50,7 +50,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 character.localRotation = m_CharacterTargetRot;
                 camera.localRotation = m_CameraTargetRot;
             }
-
             UpdateCursorLock();
         }
 
@@ -106,7 +105,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             angleX = Mathf.Clamp (angleX, MinimumX, MaximumX);
 
             q.x = Mathf.Tan (0.5f * Mathf.Deg2Rad * angleX);
-
             return q;
         }
 
