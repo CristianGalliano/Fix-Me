@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     public float PowerLevel = 100;
     public bool[] PartsFound;
     public int BatteryCount;
+    public int BatteryMax;
 
     [Header("State Parameters")]
     public float PowerUsageRate = 0.1f;
@@ -44,12 +45,15 @@ public class Player : MonoBehaviour
     }
 
     #region Inventory
-    public void Pickup(string item)
+    public bool Pickup(string item)
     {
         switch (item)
         {
             case "Battery":
-                BatteryCount++;
+                if (BatteryCount < BatteryMax)
+                    BatteryCount++;
+                else
+                    return false;
                 break;
             case "Leg":
                 PartsFound[0] = true;
@@ -64,6 +68,8 @@ public class Player : MonoBehaviour
                 PartsFound[3] = true;
                 break;
         }
+
+        return true;
     }
     #endregion
 
