@@ -19,15 +19,24 @@ public class Player : MonoBehaviour
 
     [Header("Player Info")]
     public float PowerLevel = 100;
-    public bool[] PartsFound;
+    public bool[] PartsFound = new bool[4];
     public int BatteryCount;
     public int BatteryMax;
-
-    [Header("State Parameters")]
     public float PowerUsageRate = 0.1f;
+
+    [Header("Animations")]
+    GameObject Root;
+    Animation anim;
+
+    public UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController Movement;
+
+
     void Start()
     {
-        
+        PartsFound = new bool[4];
+        Movement = GetComponent<UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController>();
+        anim = GetComponent<Animation>();
+        Root = transform.parent.gameObject;
     }
 
     void Update()
@@ -43,6 +52,31 @@ public class Player : MonoBehaviour
             UseBattery();
         }
     }
+
+    #region Abilities
+
+    private void OnTriggerStay(Collider other)
+    {
+        Debug.Log(other.tag);
+
+        if(other.tag == "Ledge")
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                Clamber();
+            }
+        }
+    }
+
+    void Clamber()
+    {
+        Root.transform.position = transform.position;
+        transform.localPosition = new Vector3(0, 0, 0);
+        Root.transform.rotation = transform.rotation;
+        transform.localRotation = Quaternion.identity;
+        anim.Play("ClimbAnim");
+    }
+    #endregion
 
     #region Inventory
     public bool Pickup(string item)

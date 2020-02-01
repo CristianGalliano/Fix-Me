@@ -7,6 +7,7 @@ public class Pickup : MonoBehaviour
     public GameObject Model;
     private GameObject spawned;
     public string Item;
+    public bool Spin = true;
     public float SpinRate = 10f;
 
     // Start is called before the first frame update
@@ -19,7 +20,7 @@ public class Pickup : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Spin();
+        SpinUpdate();
     }
 
     void Spawn()
@@ -34,11 +35,19 @@ public class Pickup : MonoBehaviour
             spawned = Instantiate(Model, transform);
     }
 
-    void Spin()
+    void SpinUpdate()
     {
-        Vector3 rot = spawned.transform.localEulerAngles;
-        rot.y += SpinRate * Time.deltaTime;
-        spawned.transform.localRotation = Quaternion.Euler(rot);
+        if(Spin)
+        {
+            Vector3 rot = spawned.transform.localEulerAngles;
+            rot.y += SpinRate * Time.deltaTime;
+            spawned.transform.localRotation = Quaternion.Euler(45, rot.y, 0);
+        }
+        else
+        {
+            spawned.transform.localRotation = Quaternion.Euler(0,0,0);
+        }
+
     }
 
     private void OnTriggerStay(Collider other)
