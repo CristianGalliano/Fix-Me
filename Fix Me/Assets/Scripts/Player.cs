@@ -47,34 +47,31 @@ public class Player : MonoBehaviour
 
     void Controls()
     {
-        if(Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown(KeyCode.B))
         {
             UseBattery();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Clamber();
         }
     }
 
     #region Abilities
 
-    private void OnTriggerStay(Collider other)
-    {
-        Debug.Log(other.tag);
-
-        if(other.tag == "Ledge")
-        {
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                Clamber();
-            }
-        }
-    }
-
     void Clamber()
     {
-        Root.transform.position = transform.position;
-        transform.localPosition = new Vector3(0, 0, 0);
-        Root.transform.rotation = transform.rotation;
-        transform.localRotation = Quaternion.identity;
-        anim.Play("ClimbAnim");
+        RaycastHit hit;
+
+        if(Physics.Raycast(transform.position, transform.forward, out hit) && hit.collider.tag == "Ledge")
+        {
+            Root.transform.position = transform.position;
+            transform.localPosition = new Vector3(0, 0, 0);
+            Root.transform.rotation = transform.rotation;
+            transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+            anim.Play("ClimbAnim");
+        }
     }
     #endregion
 
@@ -126,8 +123,6 @@ public class Player : MonoBehaviour
         {
             Debug.Log("No Batteries");
         }
-
-
     }
 
     void PowerUsage()
