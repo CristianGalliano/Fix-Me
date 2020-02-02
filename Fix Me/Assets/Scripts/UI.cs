@@ -24,6 +24,9 @@ public class UI : MonoBehaviour
     public TextMeshProUGUI ObjectivesText;
     public Image[] BodyParts;
 
+    public GameObject FadePanel;
+    public TextMeshProUGUI FadeText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -58,5 +61,11 @@ public class UI : MonoBehaviour
     {
         ChargeBar.rectTransform.sizeDelta = new Vector2(ChargeBar.rectTransform.sizeDelta.x, 200 * (Player.M.PowerLevel / 100));
         BatteryCount.text = "x" + Player.M.BatteryCount;
+    }
+
+    public void FadeOut(string reason)
+    {
+        FadePanel.GetComponent<Animation>().Play("FadeOut");
+        FadeText.text = reason;
     }
 }

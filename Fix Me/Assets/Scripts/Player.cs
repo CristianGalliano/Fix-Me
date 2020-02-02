@@ -143,12 +143,13 @@ public class Player : MonoBehaviour
     #region Power Level
     public void UseBattery()
     {
-        if (BatteryCount > 1)
+        if (BatteryCount >= 1)
         {
             if (PowerLevel <= 99)
             {
                 BatteryCount--;
                 PowerLevel = 100;
+                GetComponent<AudioSource>().Play();
             }
             else
             {
@@ -165,10 +166,8 @@ public class Player : MonoBehaviour
     {
         PowerLevel -= PowerUsageRate * Time.deltaTime;
 
-        if (PowerLevel < 0)
-        {
-            Debug.Log("Power Out");
-        }
+        if (PowerLevel <= 0)
+            StartCoroutine( Game.M.Dead("Lost All Power"));
     }
     #endregion
 }
