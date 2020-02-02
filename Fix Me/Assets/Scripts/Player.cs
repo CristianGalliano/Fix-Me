@@ -23,10 +23,12 @@ public class Player : MonoBehaviour
     public int BatteryCount;
     public int BatteryMax;
     public float PowerUsageRate = 0.1f;
+    public float ClimbDist = 5f;
 
     [Header("Animations")]
     GameObject Root;
     Animation anim;
+    bool climbing = false;
 
     public UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController Movement;
 
@@ -54,23 +56,33 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Clamber();
+            StartCoroutine(Clamber());
         }
     }
 
     #region Abilities
 
-    void Clamber()
+    IEnumerator Clamber()
     {
         RaycastHit hit;
 
-        if(Physics.Raycast(transform.position, transform.forward, out hit) && hit.collider.tag == "Ledge")
+        if(Physics.Raycast(transform.position, transform.forward, out hit, ClimbDist) && hit.collider.tag == "Ledge" && !climbing)
         {
+
             Root.transform.position = transform.position;
-            transform.localPosition = new Vector3(0, 0, 0);
             Root.transform.rotation = transform.rotation;
+
+            transform.localPosition = new Vector3(0, 0, 0);
             transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+
+            climbing = true;
+
             anim.Play("ClimbAnim");
+            Movement.enabled = false;
+            yield return new WaitForSeconds(1f);
+            Movement.mouseLook.m_CharacterTargetRot = Quaternion.identity;
+            Movement.enabled = true;
+            climbing = false;
         }
     }
     #endregion
