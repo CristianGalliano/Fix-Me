@@ -25,8 +25,6 @@ public class Player : MonoBehaviour
     public float PowerUsageRate = 0.1f;
     public float ClimbDist = 5f;
 
-    private float StartSpeed;
-
     [Header("Animations")]
     GameObject Root;
     Animation anim;
@@ -41,9 +39,6 @@ public class Player : MonoBehaviour
         Movement = GetComponent<UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController>();
         anim = GetComponent<Animation>();
         Root = transform.parent.gameObject;
-
-        StartSpeed = Movement.movementSettings.ForwardSpeed;
-        SetStats();
     }
 
     void Update()
@@ -71,7 +66,7 @@ public class Player : MonoBehaviour
     {
         RaycastHit hit;
 
-        if(PartsFound[1] && Physics.Raycast(transform.position, transform.forward, out hit, ClimbDist) && hit.collider.tag == "Ledge" && !climbing)
+        if(Physics.Raycast(transform.position, transform.forward, out hit, ClimbDist) && hit.collider.tag == "Ledge" && !climbing)
         {
 
             Root.transform.position = transform.position;
@@ -117,28 +112,7 @@ public class Player : MonoBehaviour
                 break;
         }
 
-        SetStats();
-
         return true;
-    }
-
-    void SetStats()
-    {
-        Movement.CanJump = PartsFound[0];
-
-        float temp;
-
-        if (PartsFound[0])
-            temp = 1f;
-        else
-            temp = 0.75f;
-
-        Movement.movementSettings.ForwardSpeed = StartSpeed * temp;
-        Movement.movementSettings.BackwardSpeed = StartSpeed * temp;
-        Movement.movementSettings.StrafeSpeed = StartSpeed * temp;
-
-        Movement.movementSettings.CanRun = PartsFound[0];
-
     }
     #endregion
 

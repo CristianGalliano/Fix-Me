@@ -20,8 +20,6 @@ public class Game : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public List<EnemyAIScript> AllEnemies = new List<EnemyAIScript>();
-
     // Start is called before the first frame update
     void Start()
     {
