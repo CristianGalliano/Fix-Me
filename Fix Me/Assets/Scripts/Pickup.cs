@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Pickup : MonoBehaviour
 {
     public GameObject Model;
