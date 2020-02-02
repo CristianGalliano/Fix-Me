@@ -16,14 +16,14 @@ public class Game : MonoBehaviour
         {
             Destroy(this);
         }
-
-        DontDestroyOnLoad(gameObject);
     }
+
+    bool dead;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -34,7 +34,15 @@ public class Game : MonoBehaviour
 
     public void Caught()
     {
-        Player.M.Movement.enabled = false;
+        Dead("Caught by Robots");
+    }
+
+    public IEnumerator Dead(string item)
+    {
+        UI.M.FadeOut(item);
+        dead = true;
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public string Objective()
