@@ -44,13 +44,16 @@ public class Game : MonoBehaviour
             string temp = "";
 
             if (!Player.M.PartsFound[0])
-                temp += "Find Eye \n";
+                temp += "- Find Eye \n";
 
-            if (!Player.M.PartsFound[0])
-                temp += "Find Arm \n";
+            if (!Player.M.PartsFound[1])
+                temp += "- Find Arm \n";
 
-            if (!Player.M.PartsFound[0])
-                temp += "Find Leg \n";
+            if (!Player.M.PartsFound[2])
+                temp += "- Find Leg \n";
+
+            if (!Player.M.PartsFound[3])
+                temp += "- Find Power Core \n";
 
             return temp;
         }

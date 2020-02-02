@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UI : MonoBehaviour
 {
@@ -19,8 +20,9 @@ public class UI : MonoBehaviour
     }
 
     public Image ChargeBar;
-    public Text BatteryCount;
-    public Text PartsFound;
+    public TextMeshProUGUI BatteryCount;
+    public TextMeshProUGUI ObjectivesText;
+    public Image[] BodyParts;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,30 @@ public class UI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Parts();
+        Objectives();
+        Battery();
+    }
+
+    void Objectives()
+    {
+        ObjectivesText.text = Game.M.Objective();
+    }
+
+    void Parts()
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            if (Player.M.PartsFound[i])
+                BodyParts[i].color = new Color(0f,0f,150f/255f);
+            else
+                BodyParts[i].color = new Color(200f/255f, 0f, 0);
+        }
+    }
+
+    void Battery()
+    {
+        ChargeBar.rectTransform.sizeDelta = new Vector2(ChargeBar.rectTransform.sizeDelta.x, 200 * (Player.M.PowerLevel / 100));
+        BatteryCount.text = "x" + Player.M.BatteryCount;
     }
 }
