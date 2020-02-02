@@ -5,98 +5,88 @@ using UnityEngine.AI;
 
 public class EnemyAIScript : MonoBehaviour
 {
-    private Player target = null;
-    private bool isSearching = false;
-    private Vector3 randomPosition;
-
-    [SerializeField] private Player testController;
-
     [Header("Starting State")]
     [SerializeField] private bool isSleeping;
-
-    [Header("Triggers For Player Detection")]
-    [SerializeField] private SphereCollider sleepStateTrigger, idlingTrigger, searchingStateTrigger;
 
     [Header("Timing And Speed")]
     [SerializeField] private float searchTime;
     [SerializeField] private float moveSpeed;
     [SerializeField] private float searchingMoveSpeed;
 
+    private Player target = null;
     private NavMeshAgent thisAgent;
+    private SphereCollider robotTrigger;
 
     private Vector3[] navigationPoints = new Vector3[20];
-    [SerializeField] private Vector3 currentDestination;
+    private Vector3 currentDestination;
+    private Vector3 randomPosition;
+    private Vector3 lastPosition;
 
+    private bool isChasing = false;
+    private bool idle = false;
+    private bool playerInRange = false;
     private bool onBreak = false;
+    private bool chasePlayer = false;
 
     private void Awake()
     {
+        robotTrigger = GetComponent<SphereCollider>();
         thisAgent = GetComponent<NavMeshAgent>();
+        if (isSleeping)
+        {
+            StartCoroutine(AIStates("Sleep", null));
+        }
+        else
+        {
+            StartCoroutine(AIStates("Idle", null));
+        }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 1.0f;
         for (int i = 0; i < navigationPoints.Length; i++)
         {
-            navigationPoints[i] = new Vector3(Random.Range(5, 50), 0, Random.Range(5, 50));
+            navigationPoints[i] = new Vector3(Random.Range(5, 101), 0, Random.Range(5, 101));
         }
         currentDestination = navigationPoints[Random.Range(0, navigationPoints.Length)];
     }
 
-    // Update is called once per frame
     void Update()
-    {        
-        //if (Input.GetKeyDown(KeyCode.E) && target == null)
-        //{
-        //    StartCoroutine(DetectPlayer(new Collider()));
-        //}
-
-        if (isSleeping && !target && !isSearching)
+    {
+        if (!isSleeping)
         {
-            GetComponent<Animator>().SetBool("Open_Anim", false);
-            // sleeping state.
-            sleepStateTrigger.enabled = true;
-            searchingStateTrigger.enabled = false;
-            idlingTrigger.enabled = false;
-        }
-        else if (target && !isSearching && !isSleeping)
-        {
-            // alerted state.
-            searchingStateTrigger.enabled = true;
-            idlingTrigger.enabled = false;
-            sleepStateTrigger.enabled = false;
-
-            moveTowardsTarget(searchingMoveSpeed, target.transform.position);
-            //moveTowardsRandomLocation(searchingMoveSpeed);
-        }
-        else if (isSearching && !target && !isSleeping)
-        {
-            Debug.Log("searching state");
-            //alerted roaming state.
-            searchingStateTrigger.enabled = true;
-            idlingTrigger.enabled = false;
-            sleepStateTrigger.enabled = false;
-            moveTowardsRandomLocation(searchingMoveSpeed);
-        }
-        else if (!isSearching && !target && !isSleeping)
-        {
-            Debug.Log("idle state");
-            GetComponent<Animator>().SetBool("Open_Anim", true);
-            // idle roaming state.
-            idlingTrigger.enabled = true;
-            searchingStateTrigger.enabled = false;
-            sleepStateTrigger.enabled = false;
-            moveTowardsRandomLocation(searchingMoveSpeed);
-        }
+            if (idle)
+            {
+                MoveTowardsRandomLocation(moveSpeed);
+            }
+            else if (target && isChasing)
+            {
+                if (playerInRange)
+                {
+                    MoveTowardsTarget(searchingMoveSpeed, target.transform.position);
+                }
+                else
+                {
+                    MoveTowardsTarget(searchingMoveSpeed, lastPosition);
+                }
+            }
+            else if (!target && isChasing)
+            {
+                MoveTowardsRandomLocation(searchingMoveSpeed);
+            }
+        }       
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.GetComponent<Player>())
         {
-            StartCoroutine(DetectPlayer(other));
+            Debug.Log("Player entered trigger. Aggro!");
+            playerInRange = true;
+            isChasing = true;
+            idle = false;
+            StopAllCoroutines();
+            StartCoroutine(AIStates("Chase", other));
         }
     }
 
@@ -104,47 +94,32 @@ public class EnemyAIScript : MonoBehaviour
     {
         if (other.GetComponent<Player>())
         {
-            StartCoroutine(searchForPlayer());
+            Debug.Log("Player left trigger. Lost aggro!");
+            playerInRange = false;
+            lastPosition = other.transform.position;
+            StartCoroutine(AIStates("Chase", other));
         }
     }
 
-    private IEnumerator DetectPlayer(Collider other)
+    private void MoveTowardsTarget(float MoveSpeed, Vector3 TargetPos)
     {
-        if (isSleeping)
+        if (Vector3.Distance(transform.position, TargetPos) < 1)
         {
-            //set animation bool.
-            //wait for animation to finish.
-            isSleeping = false;
-            GetComponent<Animator>().SetBool("Open_Anim", true);
-            yield return new WaitForSeconds(3.2f);
+            StartCoroutine(AIStates("Alert", null));
         }
-        target = other.GetComponent<Player>();             
-        GetComponent<Animator>().SetBool("Walk_Anim", true);
-        yield return new WaitForSeconds(1f);
-        target = testController;
-        isSearching = false;
-        StopAllCoroutines();
-        yield return null;
+        else
+        {
+            thisAgent.speed = MoveSpeed;
+            thisAgent.destination = new Vector3(TargetPos.x, 0, TargetPos.z);
+            thisAgent.updateRotation = true;
+        }
     }
 
-    private IEnumerator searchForPlayer()
-    {
-        isSearching = true;
-        yield return new WaitForSeconds(searchTime);
-    }
-
-    private void moveTowardsTarget(float MoveSpeed, Vector3 TargetPos)
-    {
-        thisAgent.speed = MoveSpeed;
-        thisAgent.destination = new Vector3(TargetPos.x, 0, TargetPos.z);
-        thisAgent.updateRotation = true;
-    }
-
-    private void moveTowardsRandomLocation(float MoveSpeed)
+    private void MoveTowardsRandomLocation(float MoveSpeed)
     {
         if (!onBreak)
         {
-            if (Vector3.Distance(transform.position, currentDestination) < 3)
+            if (Vector3.Distance(transform.position, currentDestination) < 2)
             {
                 onBreak = true;
                 StartCoroutine(Break());
@@ -158,12 +133,8 @@ public class EnemyAIScript : MonoBehaviour
         }
     }
 
-    private int count = 0;
-
     private IEnumerator Break()
     {
-        count++;
-        Debug.Log(count);
         GetComponent<Animator>().SetBool("Walk_Anim", false);
         yield return new WaitForSeconds(5.0f);
         GetComponent<Animator>().SetBool("Walk_Anim", true);
@@ -173,5 +144,55 @@ public class EnemyAIScript : MonoBehaviour
             currentDestination = navigationPoints[Random.Range(0, navigationPoints.Length)];
         }
         onBreak = false;
+    }
+
+    private IEnumerator AIStates(string state, Collider playerCol)
+    {
+        switch (state)
+        {
+            case "Sleep":
+                Debug.Log("Sleeping!");
+                isSleeping = true;
+                robotTrigger.radius = (0.25f);
+                GetComponent<Animator>().SetBool("Open_Anim", false);
+                yield return new WaitForSeconds(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length + GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime);
+                break;
+
+            case "Idle":
+                Debug.Log("Idle Roaming!");
+                robotTrigger.radius = (0.75f);
+                if (!GetComponent<Animator>().GetBool("Open_Anim"))
+                {
+                    GetComponent<Animator>().SetBool("Open_Anim", true);                   
+                    yield return new WaitForSeconds(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length + GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime);
+                }
+                GetComponent<Animator>().SetBool("Walk_Anim", true);
+                idle = true;
+                break;
+
+            case "Chase":
+                Debug.Log("Chase Player!");
+                robotTrigger.radius = (1.5f);
+                if (isSleeping)
+                {
+                    GetComponent<Animator>().SetBool("Open_Anim", true);
+                    yield return new WaitForSeconds(GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length + GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime);
+                    isSleeping = false;
+                }
+                GetComponent<Animator>().SetBool("Walk_Anim", true);
+                if (playerInRange)
+                {
+                    target = playerCol.GetComponent<Player>();                 
+                }
+                break;
+
+            case "Alert":
+                Debug.Log("Alerted Roaming!");
+                GetComponent<Animator>().SetBool("Walk_Anim", false);
+                yield return new WaitForSeconds(searchTime);
+                GetComponent<Animator>().SetBool("Walk_Anim", true);
+                target = null;
+                break;            
+        }     
     }
 }
