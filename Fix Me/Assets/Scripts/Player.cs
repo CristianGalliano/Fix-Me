@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
     public float PowerUsageRate = 0.1f;
     public float ClimbDist = 5f;
 
+    private float StartSpeed;
+
     [Header("Animations")]
     GameObject Root;
     Animation anim;
@@ -39,6 +41,9 @@ public class Player : MonoBehaviour
         Movement = GetComponent<UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController>();
         anim = GetComponent<Animation>();
         Root = transform.parent.gameObject;
+
+        StartSpeed = Movement.movementSettings.ForwardSpeed;
+        SetStats();
     }
 
     void Update()
@@ -66,7 +71,7 @@ public class Player : MonoBehaviour
     {
         RaycastHit hit;
 
-        if(Physics.Raycast(transform.position, transform.forward, out hit, ClimbDist) && hit.collider.tag == "Ledge" && !climbing)
+        if (PartsFound[1] && Physics.Raycast(transform.position, transform.forward, out hit, ClimbDist) && hit.collider.tag == "Ledge" && !climbing)
         {
 
             Root.transform.position = transform.position;
@@ -112,14 +117,33 @@ public class Player : MonoBehaviour
                 break;
         }
 
+        SetStats();
+
         return true;
+    }
+
+    void SetStats()
+    {
+        Movement.movementSettings.CanJump = PartsFound[0];
+        Movement.movementSettings.CanRun = PartsFound[0];
+
+        float temp;
+
+        if (PartsFound[0])
+            temp = 1f;
+        else
+            temp = 0.75f;
+
+        Movement.movementSettings.ForwardSpeed = StartSpeed * temp;
+        Movement.movementSettings.BackwardSpeed = StartSpeed * temp;
+        Movement.movementSettings.StrafeSpeed = StartSpeed * temp;
     }
     #endregion
 
     #region Power Level
     public void UseBattery()
     {
-        if(BatteryCount > 1)
+        if (BatteryCount > 1)
         {
             if (PowerLevel <= 99)
             {
@@ -141,7 +165,7 @@ public class Player : MonoBehaviour
     {
         PowerLevel -= PowerUsageRate * Time.deltaTime;
 
-        if(PowerLevel < 0)
+        if (PowerLevel < 0)
         {
             Debug.Log("Power Out");
         }

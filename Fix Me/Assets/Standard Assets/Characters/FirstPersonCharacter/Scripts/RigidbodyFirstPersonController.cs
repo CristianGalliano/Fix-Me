@@ -19,6 +19,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             public AnimationCurve SlopeCurveModifier = new AnimationCurve(new Keyframe(-90.0f, 1.0f), new Keyframe(0.0f, 1.0f), new Keyframe(90.0f, 0.0f));
             [HideInInspector] public float CurrentTargetSpeed = 8f;
 
+            public bool CanRun;
+            public bool CanJump;
+
 #if !MOBILE_INPUT
             private bool m_Running;
 #endif
@@ -43,7 +46,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 					CurrentTargetSpeed = ForwardSpeed;
 				}
 #if !MOBILE_INPUT
-	            if (Input.GetKey(RunKey))
+	            if (Input.GetKey(RunKey) && CanRun)
 	            {
 		            CurrentTargetSpeed *= RunMultiplier;
 		            m_Running = true;
@@ -129,7 +132,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             RotateView();
 
-            if (Input.GetButtonDown("Jump") && !m_Jump)
+            if (Input.GetButtonDown("Jump") && !m_Jump && movementSettings.CanJump)
             {
                 m_Jump = true;
             }
