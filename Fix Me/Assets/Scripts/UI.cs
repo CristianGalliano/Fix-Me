@@ -27,6 +27,8 @@ public class UI : MonoBehaviour
     public GameObject FadePanel;
     public TextMeshProUGUI FadeText;
 
+    public TextMeshProUGUI InteractText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -67,5 +69,10 @@ public class UI : MonoBehaviour
     {
         FadePanel.GetComponent<Animation>().Play("FadeOut");
         FadeText.text = reason;
+    }
+
+    public void ToggleInteract(bool toggle)
+    {
+        InteractText.enabled = toggle;
     }
 }

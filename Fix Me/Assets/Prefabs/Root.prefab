@@ -1532,6 +1532,8 @@ GameObject:
   - component: {fileID: 6986059398169564016}
   - component: {fileID: 6986059398171813172}
   - component: {fileID: 1597175263591644824}
+  - component: {fileID: 506221295446687276}
+  - component: {fileID: 5934287346991114386}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1599,9 +1601,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 6986059398166352624}
   movementSettings:
-    ForwardSpeed: 8
-    BackwardSpeed: 4
-    StrafeSpeed: 4
+    ForwardSpeed: 10
+    BackwardSpeed: 5
+    StrafeSpeed: 5
     RunMultiplier: 2
     RunKey: 304
     JumpForce: 50
@@ -1675,7 +1677,38 @@ MonoBehaviour:
   BatteryMax: 0
   PowerUsageRate: 0.1
   ClimbDist: 1
+  eye: {fileID: 0}
   Movement: {fileID: 0}
+--- !u!136 &506221295446687276
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6986059398164713686}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.75
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!111 &5934287346991114386
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6986059398164713686}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 8bc4f6aaaa8091d47b268d127c17093b, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &7055842027062176347
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ public class EnemyAIScript : MonoBehaviour
     private NavMeshAgent thisAgent;
     private SphereCollider robotTrigger;
 
-    private Vector3[] navigationPoints = new Vector3[20];
+    //private Vector3[] navigationPoints = new Vector3[20];
     private Vector3 currentDestination;
     private Vector3 randomPosition;
     private Vector3 lastPosition;
@@ -44,11 +44,7 @@ public class EnemyAIScript : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < navigationPoints.Length; i++)
-        {
-            navigationPoints[i] = new Vector3(Random.Range(5, 101), 0, Random.Range(5, 101));
-        }
-        currentDestination = navigationPoints[Random.Range(0, navigationPoints.Length)];
+        currentDestination = Game.M.navPointVectors[Random.Range(0, Game.M.navPointVectors.Count)];
     }
 
     void Update()
@@ -141,7 +137,7 @@ public class EnemyAIScript : MonoBehaviour
         Vector3 tmp = currentDestination;
         while (tmp == currentDestination)
         {
-            currentDestination = navigationPoints[Random.Range(0, navigationPoints.Length)];
+            currentDestination = Game.M.navPointVectors[Random.Range(0, Game.M.navPointVectors.Count)];
         }
         onBreak = false;
     }

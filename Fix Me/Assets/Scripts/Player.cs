@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
     public float PowerUsageRate = 0.1f;
     public float ClimbDist = 5f;
 
+    public Light eye;
+
     private float StartSpeed;
 
     [Header("Animations")]
@@ -62,6 +64,28 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(Clamber());
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<EnemyAIScript>() && !other.isTrigger)
+        {
+            Game.M.Caught();
+        }
+
+        if(other.GetComponent<Pickup>())
+        {
+            Debug.Log("sefs");
+            UI.M.ToggleInteract(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.GetComponent<Pickup>())
+        {
+            UI.M.ToggleInteract(false);
         }
     }
 
@@ -103,13 +127,13 @@ public class Player : MonoBehaviour
                 else
                     return false;
                 break;
-            case "Leg":
+            case "Eye":
                 PartsFound[0] = true;
                 break;
             case "Arm":
                 PartsFound[1] = true;
                 break;
-            case "Eye":
+            case "Leg":
                 PartsFound[2] = true;
                 break;
             case "Power Core":
@@ -124,12 +148,15 @@ public class Player : MonoBehaviour
 
     void SetStats()
     {
-        Movement.movementSettings.CanJump = PartsFound[0];
-        Movement.movementSettings.CanRun = PartsFound[0];
+
+        eye.enabled = PartsFound[0];
+
+        Movement.movementSettings.CanJump = PartsFound[1];
+        Movement.movementSettings.CanRun = PartsFound[1];
 
         float temp;
 
-        if (PartsFound[0])
+        if (PartsFound[1])
             temp = 1f;
         else
             temp = 0.75f;
@@ -137,6 +164,7 @@ public class Player : MonoBehaviour
         Movement.movementSettings.ForwardSpeed = StartSpeed * temp;
         Movement.movementSettings.BackwardSpeed = StartSpeed * temp;
         Movement.movementSettings.StrafeSpeed = StartSpeed * temp;
+
     }
     #endregion
 
